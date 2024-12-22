@@ -1,49 +1,49 @@
-import gradio as gr
+import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
-# We'll keep the derivatives and RK4 step inside a function for cleanliness.
-def simulate_fdo(m, k, c, F0, Omega, x0, v0, t0, tf, dt):
+# Use the built-in Streamlit command to render plots inline
+st.set_option('deprecation.showPyplotGlobalUse', False)
+
+
+def run_simulation(m, k, c, F0, Omega, x0, v0, tf, dt):
     """
-    Solve the forced damped oscillator using RK4 and return two Matplotlib plots:
-    1) Displacement vs. Time
-    2) Phase Diagram (Velocity vs. Displacement)
+    Run the Forced Damped Oscillator simulation using 4th-order Runge-Kutta.
+    Returns time_points, x_points, and v_points as numpy arrays.
     """
 
-    # --- Define helper functions ---
-    # natural frequency of undamped system
-    omega0 = np.sqrt(k/m)
-    # damping ratio
-    zeta = c / (2.0 * np.sqrt(k * m))
+    # Derived parameters
+    omega0 = np.sqrt(k / m)          # Natural frequency of the undamped system
+    zeta = c / (2.0 * np.sqrt(k * m))  # Damping ratio
 
+    # Define the system of first-order ODEs
     def derivatives(t, x, v):
-        """
-        Returns dx/dt, dv/dt for the forced damped oscillator.
-        """
         dxdt = v
         dvdt = -2*zeta*omega0*v - (omega0**2)*x + (F0/m)*np.cos(Omega*t)
         return dxdt, dvdt
 
+    # One RK4 step
     def rk4_step(t, x, v, dt):
         dxdt1, dvdt1 = derivatives(t, x, v)
-
         dxdt2, dvdt2 = derivatives(t + 0.5*dt, x + 0.5*dxdt1*dt, v + 0.5*dvdt1*dt)
         dxdt3, dvdt3 = derivatives(t + 0.5*dt, x + 0.5*dxdt2*dt, v + 0.5*dvdt2*dt)
-        dxdt4, dvdt4 = derivatives(t + dt,     x + dxdt3*dt,     v + dvdt3*dt)
+        dxdt4, dvdt4 = derivatives(t + dt,     x + dxdt3*dt,    v + dvdt3*dt)
 
-        x_new = x + (dt/6.0)*(dxdt1 + 2*dxdt2 + 2*dxdt3 + dxdt4)
-        v_new = v + (dt/6.0)*(dvdt1 + 2*dvdt2 + 2*dvdt3 + dvdt4)
+        x_new = x + (dt / 6.0) * (dxdt1 + 2*dxdt2 + 2*dxdt3 + dxdt4)
+        v_new = v + (dt / 6.0) * (dvdt1 + 2*dvdt2 + 2*dvdt3 + dvdt4)
         return x_new, v_new
 
-    # --- Perform the numerical integration with RK4 ---
-    time_points = [t0]
-    x_points = [x0]
-    v_points = [v0]
-
+    # Initialize
+    t0 = 0.0
     t = t0
     x = x0
     v = v0
 
+    time_points = [t]
+    x_points = [x]
+    v_points = [v]
+
+    # Time-stepping with RK4
     while t < tf:
         x, v = rk4_step(t, x, v, dt)
         t += dt
@@ -51,59 +51,76 @@ def simulate_fdo(m, k, c, F0, Omega, x0, v0, t0, tf, dt):
         x_points.append(x)
         v_points.append(v)
 
-    # Convert lists to numpy arrays
+    # Convert to numpy arrays
     time_points = np.array(time_points)
     x_points = np.array(x_points)
     v_points = np.array(v_points)
 
-    # --- Create the plots ---
-    # 1) Displacement vs. time
-    fig_time = plt.figure(figsize=(8, 5))
-    plt.plot(time_points, x_points, label='Displacement (x)')
-    plt.xlabel('Time (s)')
-    plt.ylabel('Displacement (m)')
-    plt.title('Forced Damped Oscillation (RK4)')
-    plt.grid(True)
-    plt.legend()
+    return time_points, x_points, v_points
 
-    # 2) Phase plot
-    fig_phase = plt.figure(figsize=(5, 5))
-    plt.plot(x_points, v_points, label='Phase Trajectory')
-    plt.xlabel('Displacement (m)')
-    plt.ylabel('Velocity (m/s)')
-    plt.title('Phase Diagram')
-    plt.grid(True)
-    plt.legend()
 
-    # Return the figures
-    return fig_time, fig_phase
+def main():
+    st.title("Forced Damped Oscillator Simulation")
 
-# Build the Gradio interface
-demo = gr.Interface(
-    fn=simulate_fdo,
-    inputs=[
-        gr.Number(value=1.0, label="Mass (m)"),
-        gr.Number(value=1.0, label="Spring Constant (k)"),
-        gr.Number(value=0.2, label="Damping Coefficient (c)"),
-        gr.Number(value=0.5, label="Forcing Amplitude (F0)"),
-        gr.Number(value=1.0, label="Driving Frequency (Omega)"),
-        gr.Number(value=0.0, label="Initial Displacement (x0)"),
-        gr.Number(value=0.0, label="Initial Velocity (v0)"),
-        gr.Number(value=0.0, label="Start Time (t0)"),
-        gr.Number(value=50.0, label="End Time (tf)"),
-        gr.Number(value=0.01, label="Time Step (dt)")
-    ],
-    outputs=[
-        gr.Plot(label="Time Series: x(t)"),
-        gr.Plot(label="Phase Plot: v vs. x")
-    ],
-    title="Forced Damped Oscillator (RK4)",
-    description=(
-        "This app numerically solves the Forced Damped Oscillator problem using the "
-        "RK4 method. Adjust parameters and see the displacement over time and the "
-        "phase plot."
+    st.markdown(
+        """
+        This app simulates a **forced damped oscillator** using the 4th-order 
+        Runge-Kutta (RK4) method. Adjust the parameters below, then click 
+        **Run Simulation**.
+        """
     )
-)
+
+    # Sidebar inputs
+    st.sidebar.header("Input Parameters")
+
+    # Mass (m)
+    m = st.sidebar.number_input("Mass (m) [kg]", value=1.0, format="%.3f")
+
+    # Spring constant (k)
+    k = st.sidebar.number_input("Spring constant (k) [N/m]", value=1.0, format="%.3f")
+
+    # Damping coefficient (c)
+    c = st.sidebar.number_input("Damping coefficient (c) [N·s/m]", value=0.2, format="%.3f")
+
+    # Forcing amplitude (F0)
+    F0 = st.sidebar.number_input("Forcing amplitude (F0) [N]", value=0.5, format="%.3f")
+
+    # Driving frequency (Omega)
+    Omega = st.sidebar.number_input("Driving frequency (Ω) [rad/s]", value=1.0, format="%.3f")
+
+    # Initial displacement (x0)
+    x0 = st.sidebar.number_input("Initial displacement (x0) [m]", value=0.0, format="%.3f")
+
+    # Initial velocity (v0)
+    v0 = st.sidebar.number_input("Initial velocity (v0) [m/s]", value=0.0, format="%.3f")
+
+    # Final time and time step
+    tf = st.sidebar.number_input("End time (tf) [s]", value=50.0, format="%.1f")
+    dt = st.sidebar.number_input("Time step (dt) [s]", value=0.01, format="%.3f")
+
+    if st.button("Run Simulation"):
+        # Run the simulation
+        time_points, x_points, v_points = run_simulation(m, k, c, F0, Omega, x0, v0, tf, dt)
+
+        # Plot results
+        st.subheader("Displacement vs. Time")
+        plt.figure(figsize=(8, 5))
+        plt.plot(time_points, x_points, label='Displacement (x)')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Displacement (m)')
+        plt.grid(True)
+        plt.legend()
+        st.pyplot()
+
+        # Phase plot
+        st.subheader("Phase Diagram (Velocity vs. Displacement)")
+        plt.figure(figsize=(6, 6))
+        plt.plot(x_points, v_points)
+        plt.xlabel('Displacement (m)')
+        plt.ylabel('Velocity (m/s)')
+        plt.grid(True)
+        st.pyplot()
+
 
 if __name__ == "__main__":
-    demo.launch(share=True)
+    main()
