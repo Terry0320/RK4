@@ -60,7 +60,7 @@ def main():
     st.markdown(
         """
         This app simulates a **forced damped oscillator** using 4th-order 
-        Runge-Kutta. Adjust parameters below, then click **Run Simulation**.
+        Runge-Kutta. Adjust the parameters, then click **Run Simulation**.
         """
     )
 
