@@ -2,8 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Use the built-in Streamlit command to render plots inline
-st.set_option('deprecation.showPyplotGlobalUse', False)
+
 
 
 def run_simulation(m, k, c, F0, Omega, x0, v0, tf, dt):
