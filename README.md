@@ -4,7 +4,7 @@ YIN-HSUEH YU
 
 ## Abstract
 
-In this paper, I present a numerical study of a forced damped harmonic oscillator using a fourth-order Runge-Kutta (RK4) method. The system, governed by a second-order ordinary differential equation, is transformed into a system of first-order ODEs and integrated over time. I analyze the displacement and velocity behavior under different forcing frequencies and damping ratios, and visualize the resulting trajectories and phase portraits.
+In this paper, I present a numerical study of a forced damped harmonic oscillator using a fourth-order Runge-Kutta (RK4) method. The system, governed by a second-order ordinary differential equation, is transformed into a system of first-order ODEs and integrated over time. I analyze the displacement and velocity behavior under different forcing frequencies and damping ratios, and visualize the resulting trajectories and phase portraits. The resulting plots are included. ***I also made an online web application that demonstrates the simulation interactively.***
 
 ## 1. Introduction
 
@@ -146,6 +146,27 @@ plt.ylabel('Velocity (m/s)')
 plt.title('Phase Diagram')
 plt.grid(True)
 plt.show()
-
 ```
+
+
+## 4. Results
+
+Below are example images of the FDO simulation.
+![original image](https://cdn.mathpix.com/snip/images/dFsUnpz2G9bQ7Z5yR4iF2Z04IWrdzq4MXZ4oeeK5AMM.original.fullsize.png)
+![original image](https://cdn.mathpix.com/snip/images/Y6Fn5_6xAVFGiJFvnV2kCqfingGTt86Y7PdjscupXUc.original.fullsize.png)
+
+## 5. Interactive Web Application
+
+ I have also created a web-based application that runs this simulation in real time. Users can adjust all the parameters including:mass (kg)
+spring constant (N/m)
+damping coefficient (N·s/m)
+amplitude of the forcing (N)
+driving frequency (rad/s)
+initial displacement (m)
+initial velocity (m/s)
+start time (s)
+end time (s)
+time step (s)
+to see how the system behaves under different conditions. Access the interactive app at:
+https://rk4.onrender.com/
 
