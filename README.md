@@ -157,16 +157,17 @@ Below are example images of the FDO simulation.
 
 ## 5. Interactive Web Application
 
- I have also created a web-based application that runs this simulation in real time. Users can adjust all the parameters including:mass (kg)
-spring constant (N/m)
-damping coefficient (N·s/m)
-amplitude of the forcing (N)
-driving frequency (rad/s)
-initial displacement (m)
-initial velocity (m/s)
-start time (s)
-end time (s)
-time step (s)
+I have also created a web-based application that runs this simulation in real time. Users can adjust all the parameters including:\
+mass (kg)\
+spring constant (N/m)\
+damping coefficient (N·s/m)\
+amplitude of the forcing (N)\
+driving frequency (rad/s)\
+initial displacement (m)\
+initial velocity (m/s)\
+start time (s)\
+end time (s)\
+time step (s)\
 to see how the system behaves under different conditions. Access the interactive app at:
 https://rk4.onrender.com/
 
